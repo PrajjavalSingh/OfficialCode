@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[357]:
+# In[108]:
 
 
 import skimage 
@@ -18,26 +18,18 @@ from skimage import measure
 import cv2
 
 
-# In[358]:
+# In[109]:
 
 
 org_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\OrgPorject_Seis.jpg')
 imp_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\Imported_Seis.jpg')
 
-#imp_seis = tr.resize( imp_seis, (org_seis.shape[0],org_seis.shape[1]) )
+#TestCases
+personal_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\FromPersonalLaptop.jpg')
+inl500_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\inl500.jpg')
 
 
-# In[359]:
-
-
-print("Original Imported image size : ", imp_seis.shape)
-print("Imported image size after resize : ", imp_seis_resize.shape)
-print("Original image size : ", org_seis.shape)
-print(type(imp_seis_resize.shape[1]))
-print(type(org_seis.shape[1]))
-
-
-# In[360]:
+# In[110]:
 
 
 #FUNCTIONS
@@ -74,11 +66,9 @@ def seismicCropImage( image ):
     # Detect white regions
     rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     dilated = cv2.dilate(blurred,rectKernel)
+    
     rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (11,11))
     eroded = cv2.erode(dilated,rectKernel)
-    
-    #Blurred image outlining
-    blurred_edged = cv2.Canny(blurred, 100, 200, apertureSize=3)
     
     eroded_edged = cv2.Canny(eroded, 100, 200, apertureSize=3)
     
@@ -87,35 +77,37 @@ def seismicCropImage( image ):
     
     seismic_window_contour = sorted(contours, key = cv2.contourArea, reverse = True)[:1]
     image_with_seismic_window_contour = cv2.drawContours(seis.copy(), seismic_window_contour, -1, (0,255,0), 1)
-    #print("Image with Seismic Window Contour")
-    #plot(image_with_seismic_window_contour)
     
     for c in seismic_window_contour:
         x,y,w,h = cv2.boundingRect(c)
         actual_seismic_image = seis[y:y+h, x:x+w]
         break
     
-    #cv2.imshow('Actual Seismic Image',actual_seismic_image)
-    #plot(actual_seismic_image)
-    
     return actual_seismic_image
 
+def finalMSEImageAdjustmentAndCalc( testimage, origimage ):    
+    testimage_sec = np.float32(testimage.copy())
+    testimage_sec = cv2.cvtColor( testimage_sec, cv2.COLOR_BGR2GRAY )
+    origimage_resize = tr.resize( origimage, (testimage_sec.shape[0],testimage_sec.shape[1]) )
+    mse_comp = mse( origimage_resize, testimage_sec )
+    print( "MSE : " + str(mse_comp) )
 
-# In[361]:
+
+# In[111]:
 
 
 org_seis_sec = seismicCropImage(org_seis)
 plot(org_seis_sec)
 
 
-# In[362]:
+# In[112]:
 
 
 imp_seis_sec = seismicCropImage(imp_seis)
 plot(imp_seis_sec)
 
 
-# In[363]:
+# In[113]:
 
 
 #converting image to GrayScale
@@ -132,10 +124,10 @@ print(org_seis_sec.shape)
 print("Before : Imported Seismic Shape")
 print(imp_seis_sec.shape)
 
-org_seis_sec = tr.resize( org_seis_sec, (imp_seis_sec.shape[0],imp_seis_sec.shape[1]) )
+org_seis_sec_resize = tr.resize( org_seis_sec, (imp_seis_sec.shape[0],imp_seis_sec.shape[1]) )
 
 print("After : Original Seismic Shape")
-print(org_seis_sec.shape)
+print(org_seis_sec_resize.shape)
 
 print("After : Imported Seismic Shape")
 print(imp_seis_sec.shape)
@@ -146,14 +138,24 @@ plot(org_seis_sec)
 print("Plotting Imported Seismic section after processing")
 plot(imp_seis_sec)
 
-mse_comp = mse( org_seis_sec, imp_seis_sec )
+mse_comp = mse( org_seis_sec_resize, imp_seis_sec )
 print( "MSE : " + str(mse_comp) )
 
 
-# In[ ]:
+# In[114]:
 
 
+inl500_seis_sec = seismicCropImage(inl500_seis)
+plot(inl500_seis_sec)
+finalMSEImageAdjustmentAndCalc(inl500_seis_sec,org_seis_sec)
 
+
+# In[117]:
+
+
+personal_seis_sec = seismicCropImage(personal_seis)
+plot(personal_seis_sec)
+finalMSEImageAdjustmentAndCalc(personal_seis_sec,org_seis_sec)
 
 
 # In[ ]:
