@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[108]:
+# In[1]:
 
 
 import skimage 
@@ -18,7 +18,7 @@ from skimage import measure
 import cv2
 
 
-# In[109]:
+# In[3]:
 
 
 org_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\OrgPorject_Seis.jpg')
@@ -27,16 +27,19 @@ imp_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\Imported_Seis.jpg')
 #TestCases
 personal_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\FromPersonalLaptop.jpg')
 inl500_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\inl500.jpg')
+OriginalSeismic_TestCase_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\OriginalSeismic_TestCase.jpg')
+
+inl425_4DSMF_mirrored_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\inl425_4DSMF_mirrored.jpg')
 
 
-# In[110]:
+# In[4]:
 
 
 #FUNCTIONS
 def mse( org_image, imp_image ):
     height = org_image.shape[0]
     width = org_image.shape[1]
-    diff = cv2.subtract(org_image, imp_image,dtype=cv2.CV_32F)
+    diff = cv2.subtract(org_image, imp_image, dtype=cv2.CV_32F )
     err = np.sum( diff**2 )
     mse = err/(float(height*width))
     return mse
@@ -45,7 +48,7 @@ def image_reSize( image, ratio ):
     length = int( image.shape[1] * ratio )
     width = int( image.shape[0] * ratio )
     dim = ( length, width )
-    return cv2.resize(image, dim, interpolation = cv2.INTER_NEAREST )
+    return cv2.resize(image, dim, interpolation = cv2.INTER_AREA )
 
 def plot( image ):
     plt.figure(figsize=(16,10))
@@ -58,7 +61,7 @@ def bw_scanner(image):
 
 def seismicCropImage( image ):
     resize_ratio =  0.5
-    seis = image_reSize( image, resize_ratio )
+    seis = image_reSize( image.copy(), resize_ratio )
     seis_gray = cv2.cvtColor( seis, cv2.COLOR_BGR2GRAY )
     # Get rid of noise with Gaussian Blur filter
     blurred = cv2.GaussianBlur( seis_gray, (7,7), 0 )
@@ -93,21 +96,23 @@ def finalMSEImageAdjustmentAndCalc( testimage, origimage ):
     print( "MSE : " + str(mse_comp) )
 
 
-# In[111]:
+# In[5]:
 
 
+plot(org_seis)
 org_seis_sec = seismicCropImage(org_seis)
 plot(org_seis_sec)
+plot(org_seis)
 
 
-# In[112]:
+# In[6]:
 
 
 imp_seis_sec = seismicCropImage(imp_seis)
 plot(imp_seis_sec)
 
 
-# In[113]:
+# In[7]:
 
 
 #converting image to GrayScale
@@ -142,7 +147,7 @@ mse_comp = mse( org_seis_sec_resize, imp_seis_sec )
 print( "MSE : " + str(mse_comp) )
 
 
-# In[114]:
+# In[8]:
 
 
 inl500_seis_sec = seismicCropImage(inl500_seis)
@@ -150,7 +155,7 @@ plot(inl500_seis_sec)
 finalMSEImageAdjustmentAndCalc(inl500_seis_sec,org_seis_sec)
 
 
-# In[117]:
+# In[9]:
 
 
 personal_seis_sec = seismicCropImage(personal_seis)
@@ -158,8 +163,18 @@ plot(personal_seis_sec)
 finalMSEImageAdjustmentAndCalc(personal_seis_sec,org_seis_sec)
 
 
-# In[ ]:
+# In[10]:
 
 
+OriginalSeismic_TestCase_seis_sec = seismicCropImage(OriginalSeismic_TestCase_seis)
+plot(OriginalSeismic_TestCase_seis_sec)
+finalMSEImageAdjustmentAndCalc(OriginalSeismic_TestCase_seis_sec,org_seis_sec)
 
+
+# In[11]:
+
+
+inl425_4DSMF_mirrored_seis_sec = seismicCropImage(inl425_4DSMF_mirrored_seis)
+plot(inl425_4DSMF_mirrored_seis_sec)
+finalMSEImageAdjustmentAndCalc(inl425_4DSMF_mirrored_seis_sec,org_seis_sec)
 
