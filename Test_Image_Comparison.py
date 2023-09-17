@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[35]:
 
 
 import skimage 
@@ -18,7 +18,7 @@ from skimage import measure
 import cv2
 
 
-# In[3]:
+# In[36]:
 
 
 org_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\OrgPorject_Seis.jpg')
@@ -28,11 +28,11 @@ imp_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\Imported_Seis.jpg')
 personal_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\FromPersonalLaptop.jpg')
 inl500_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\inl500.jpg')
 OriginalSeismic_TestCase_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\OriginalSeismic_TestCase.jpg')
-
 inl425_4DSMF_mirrored_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\inl425_4DSMF_mirrored.jpg')
+chimney_seis = cv2.imread('D:\\OfficeWork\\imagesforscript\\chimney.jpg')
 
 
-# In[4]:
+# In[46]:
 
 
 #FUNCTIONS
@@ -81,9 +81,11 @@ def seismicCropImage( image ):
     seismic_window_contour = sorted(contours, key = cv2.contourArea, reverse = True)[:1]
     image_with_seismic_window_contour = cv2.drawContours(seis.copy(), seismic_window_contour, -1, (0,255,0), 1)
     
+    actual_seismic_image = seis
     for c in seismic_window_contour:
         x,y,w,h = cv2.boundingRect(c)
         actual_seismic_image = seis[y:y+h, x:x+w]
+        print("Seismic Contour Window Applied")
         break
     
     return actual_seismic_image
@@ -96,7 +98,7 @@ def finalMSEImageAdjustmentAndCalc( testimage, origimage ):
     print( "MSE : " + str(mse_comp) )
 
 
-# In[5]:
+# In[47]:
 
 
 plot(org_seis)
@@ -105,14 +107,14 @@ plot(org_seis_sec)
 plot(org_seis)
 
 
-# In[6]:
+# In[48]:
 
 
 imp_seis_sec = seismicCropImage(imp_seis)
 plot(imp_seis_sec)
 
 
-# In[7]:
+# In[49]:
 
 
 #converting image to GrayScale
@@ -147,7 +149,7 @@ mse_comp = mse( org_seis_sec_resize, imp_seis_sec )
 print( "MSE : " + str(mse_comp) )
 
 
-# In[8]:
+# In[50]:
 
 
 inl500_seis_sec = seismicCropImage(inl500_seis)
@@ -155,7 +157,7 @@ plot(inl500_seis_sec)
 finalMSEImageAdjustmentAndCalc(inl500_seis_sec,org_seis_sec)
 
 
-# In[9]:
+# In[51]:
 
 
 personal_seis_sec = seismicCropImage(personal_seis)
@@ -163,7 +165,7 @@ plot(personal_seis_sec)
 finalMSEImageAdjustmentAndCalc(personal_seis_sec,org_seis_sec)
 
 
-# In[10]:
+# In[52]:
 
 
 OriginalSeismic_TestCase_seis_sec = seismicCropImage(OriginalSeismic_TestCase_seis)
@@ -171,10 +173,24 @@ plot(OriginalSeismic_TestCase_seis_sec)
 finalMSEImageAdjustmentAndCalc(OriginalSeismic_TestCase_seis_sec,org_seis_sec)
 
 
-# In[11]:
+# In[53]:
 
 
 inl425_4DSMF_mirrored_seis_sec = seismicCropImage(inl425_4DSMF_mirrored_seis)
 plot(inl425_4DSMF_mirrored_seis_sec)
 finalMSEImageAdjustmentAndCalc(inl425_4DSMF_mirrored_seis_sec,org_seis_sec)
+
+
+# In[45]:
+
+
+chimney_seis_sec = seismicCropImage(chimney_seis)
+plot(chimney_seis_sec)
+finalMSEImageAdjustmentAndCalc(chimney_seis_sec,org_seis_sec)
+
+
+# In[ ]:
+
+
+
 
